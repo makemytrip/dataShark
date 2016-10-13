@@ -16,7 +16,7 @@ Table of Contents
       * [start.sh](#startsh)
       * [dry_run.py](#dry_runpy)
       * [conf/](#conf)
-      * [conf/wordcount[.py|.conf|.txt]](#confwordcountpyconftxt)
+      * [conf/wordcount/wordcount[.py|.conf|.txt]](#confwordcountwordcountpyconftxt)
       * [lib/](#lib)
       * [plugins/output/](#pluginsoutput)
       * [scripts/](#scripts)
@@ -195,7 +195,7 @@ This file can be used for testing individual use cases before integrating them a
 ### conf/
 This directory is where all use cases / Plugins are places. Refer to *Writing your own use cases using dataShark* on how to write your own plugin use cases.
 
-### conf/wordcount[.py|.conf|.txt]
+### conf/wordcount/wordcount[.py|.conf|.txt]
 Wordcount is a sample use case provided with dataShark for trying out batch processing. The wordcount.txt file is a standard GNUv3 License file.
 
 ### lib/
@@ -299,9 +299,9 @@ Output Plugins
 =============
 dataShark provides the following 3 output plugins out-of-the-box for processed data persistence or transmission:
 
-> 1. Elasticsearch
-> 2. Syslog
-> 3. CSV
+1. Elasticsearch
+2. Syslog
+3. CSV
 
 Each of this plugin requires its own basic set of settings, described below.
 
