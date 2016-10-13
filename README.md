@@ -3,10 +3,33 @@
 # Welcome to dataShark
 
 Table of Contents
-=========
+=================
 
-[TOC]
-
+  * [dataShark](#datashark)
+  * [Getting Started](#getting-started)
+      * [Installing Dependencies](#installing-dependencies)
+      * [Running dataShark](#running-datashark)
+  * [Structure of dataShark](#structure-of-datashark)
+    * [The Directory Structure](#the-directory-structure)
+      * [datashark.py](#datasharkpy)
+      * [datashark.conf](#datasharkconf)
+      * [start.sh](#startsh)
+      * [dry_run.py](#dry_runpy)
+      * [conf/](#conf)
+      * [conf/wordcount[.py|.conf|.txt]](#confwordcountpyconftxt)
+      * [lib/](#lib)
+      * [plugins/output/](#pluginsoutput)
+      * [scripts/](#scripts)
+  * [Writing your own use cases using dataShark](#writing-your-own-use-cases-using-datashark)
+    * [The .conf File](#the-conf-file)
+      * [Required Keys](#required-keys)
+      * [Optional Keys](#optional-keys)
+    * [The .py file](#the-py-file)
+  * [Output Plugins](#output-plugins)
+      * [1. Elasticsearch Output Plugin](#1-elasticsearch-output-plugin)
+      * [2. Syslog Output Plugin](#2-syslog-output-plugin)
+      * [3. CSV Output Plugin](#3-csv-output-plugin)
+  * [Licensing](#licensing)
 
 dataShark
 =========
