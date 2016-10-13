@@ -14,7 +14,7 @@ Table of Contents
       * [datashark.py](#datasharkpy)
       * [datashark.conf](#datasharkconf)
       * [start.sh](#startsh)
-      * [dry_run.py](#dry_runpy)
+      * [datashark_standalone.py](#datashark_standalonepy)
       * [conf/](#conf)
       * [conf/wordcount/wordcount[.py|.conf|.txt]](#confwordcountwordcountpyconftxt)
       * [lib/](#lib)
@@ -163,7 +163,7 @@ dataShark/
 │       └── wordcount.txt
 ├── datashark.conf
 ├── datashark.py
-├── dry_run.py
+├── datashark_standalone.py
 ├── lib
 │   ├── elasticsearch-hadoop-2.2.0.jar
 │   └── spark-streaming-kafka-assembly-1.6.1.jar
@@ -191,8 +191,8 @@ The main configuration file which specifies the Kafka Queue to be consumed for S
 ### start.sh
 The shell file that is used to start up spark with all its dependencies and use cases.
 
-### dry_run.py
-This file can be used for testing individual use cases before integrating them as plugins to dataShark. You can write a use case as normal and execute it using dry_run.py using the command, `python dry_run.py conf/sample_use_case.conf` to just execute that use case. This file ignores the enabled flag in the conf, so it is advised to keep the flag set to false while doing a dry run to avoid accidental execution of the use case.
+### datashark_standalone.py
+This file can be used for testing individual use cases before integrating them as plugins to dataShark. You can write a use case as normal and execute it using datashark_standalone.py using the command, `python datashark_standalone.py conf/sample_use_case.conf` to just execute that use case. This file ignores the enabled flag in the conf, so it is advised to keep the flag set to false while doing a dry run to avoid accidental execution of the use case.
 
 ### conf/
 This directory is where all use cases / Plugins are places. Refer to *Writing your own use cases using dataShark* on how to write your own plugin use cases.
