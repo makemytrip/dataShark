@@ -55,7 +55,6 @@ We recommend the following components while running dataShark in production:
 
 > *Note*: 1, 2, 4 and 5 are purely basis our experience with the production setup. One is free to use any available alternative.
 
-[![](https://makemytrip.github.io/images/dataShark_arch.jpg)]()
 
 **Input Data Sources:**
 
