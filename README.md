@@ -174,7 +174,6 @@ dataShark/
 │       ├── out_csv.py
 │       ├── out_elasticsearch.py
 │       └── out_syslog.py
-├── plugins.md
 ├── scripts
 │   └── datashark
 └── start.sh
