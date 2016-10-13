@@ -1,9 +1,8 @@
-[![](https://makemytrip.github.io/images/dataShark_150.png)]()
-
-# Welcome to dataShark
+dataShark
+=========
 
 Table of Contents
-=================
+-----------------
 
   * [dataShark](#datashark)
   * [Getting Started](#getting-started)
