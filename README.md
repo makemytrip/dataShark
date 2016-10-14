@@ -78,6 +78,7 @@ We recommend the following components while running dataShark in production:
 2. Generating a summary of websites accessed using map / reduce on web proxy logs.
 3. Generating a summary of web and network traffic using map / reduce on Apache HTTPD and firewall logs.
 
+-------------------
 
 Getting Started
 =============
@@ -206,6 +207,8 @@ Loaded Confs: ['/opt/dataShark/conf/wordcount/wordcount.conf']
 [*] 2016-10-12 14:59:23 Cleaning Up
 ```
 
+------------------- 
+
 Structure of dataShark
 ======================
 
@@ -278,6 +281,7 @@ All output plugins are placed in this directory. The naming convention for files
 2. Syslog
 3. CSV
 
+-------------------
 
 Writing your own use cases using dataShark
 ===================
@@ -439,6 +443,8 @@ output = csv
         title = Use Case
         debug = false
 ```
+
+-------------------
 
 Contacts
 ========
