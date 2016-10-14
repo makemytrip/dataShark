@@ -114,7 +114,15 @@ Following are the requirements for Production Mode Setup:
 
 ### Running dataShark in Standalone Mode
 
-dataShark has a standalone mode for testing out use cases before plugging them in. The basic requirement to get dataShark running in standalone mode is having Apache Spark installed on the system hosting dataShark. Once spark is installed, executing a use case in standalone mode is as easy as running the following command:
+dataShark has a standalone mode for testing out use cases before plugging them in. The basic requirement to get dataShark running in standalone mode is having Apache Spark installed on the system hosting dataShark. 
+
+Once we have all these prerequisites setup, to run dataShark in Standalone Mode you first need to clone this git repository:
+
+```
+git clone https://github.com/makemytrip/dataShark.git
+```
+
+After cloning, executing a use case in standalone mode is as easy as running the following command:
 
 ```
 ./standalone.sh conf/use_case_dir/sample_use_case.conf
@@ -141,7 +149,7 @@ Loaded Confs: ['conf/wordcount/wordcount.conf']
 
 ### Running dataShark in Production Mode
 
-Once we have all these prerequisites setup, to run dataShark you first need to clone this git repository:
+Once we have all these prerequisites setup, to run dataShark in Production Mode you first need to clone this git repository:
 
 ```
 git clone https://github.com/makemytrip/dataShark.git
@@ -161,7 +169,13 @@ hdfs.host = 127.0.0.1
 hdfs.port = 9000
 ```
 
-This is all that is needed to install datashark. To start the spark engine and use cases, we can simply run the command:
+Then we need to specify the Spark Master in datashark-env.sh:
+
+```
+SPARK_INSTANCE=spark://127.0.0.1:7077
+```
+
+This is all that is needed to install and configure datashark. To start the spark engine and use cases, we can simply run the command:
 
 ```
 ./start.sh
