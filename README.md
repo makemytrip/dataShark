@@ -319,19 +319,25 @@ output = elasticsearch
 ```
 
 ### Required Keys
-`name` : Name for the Use Case.
-`type` : This can be either of **batch** or **streaming**. When using *batch* mode, the use case is run just once on the provided data file. In *streaming* mode a Kafka Stream is passed to the code file to analyze.
-`enabled` : Set this to either **true** or **false** to simply enable or disable this use case.
-`code` : The .py file corresponding to this use case.
-`training` : The log file to supply as training data to train your model. This is required only when `type = streaming`. (In batch mode, this key can be skipped)
-`file` : The data file to use for *batch* processing. This is required only when `type = batch`. (In streaming mode, this key can be skipped)
-`output` : The output plugin to use. Types of output plugins are listed below.
-`[type_of_plugin]` : The settings for the output plugin being used.
+
+```
+name : Name for the Use Case.
+type : This can be either of **batch** or **streaming**. When using *batch* mode, the use case is run just once on the provided data file. In *streaming* mode a Kafka Stream is passed to the code file to analyze.
+enabled : Set this to either **true** or **false** to simply enable or disable this use case.
+code : The .py file corresponding to this use case.
+training : The log file to supply as training data to train your model. This is required only when `type = streaming`. (In batch mode, this key can be skipped)
+file : The data file to use for *batch* processing. This is required only when `type = batch`. (In streaming mode, this key can be skipped)
+output : The output plugin to use. Types of output plugins are listed below.
+[type_of_plugin] : The settings for the output plugin being used.
+```
 
 ### Optional Keys
-`[log_filter]` : This is used to filter out the Kafka stream passed to your use case. It has the following two optional sub-sections:
-- `[[include]]` : In this sub-section each key value pair is used to filter the incoming log stream to include in the use case. The *key* is the name of the key in the JSON Document in the Kafka Stream. The *value* has to be a regex pattern that matches the content of that key.
-- `[[exclude]]` : In this sub-section each key value pair is used to filter the incoming log stream to exclude from the use case. The *key* is the name of the key in the JSON Document in the Kafka Stream. The *value* has to be a regex pattern that matches the content of that key.
+
+```
+[log_filter] : This is used to filter out the Kafka stream passed to your use case. It has the following two optional sub-sections:
+    - [[include]] : In this sub-section each key value pair is used to filter the incoming log stream to include in the use case. The *key* is the name of the key in the JSON Document in the Kafka Stream. The *value* has to be a regex pattern that matches the content of that key.
+    - [[exclude]] : In this sub-section each key value pair is used to filter the incoming log stream to exclude from the use case. The *key* is the name of the key in the JSON Document in the Kafka Stream. The *value* has to be a regex pattern that matches the content of that key.
+```
 
 The .py file
 ----------------
