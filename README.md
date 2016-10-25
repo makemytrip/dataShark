@@ -6,6 +6,7 @@ Table of Contents
 
   * [dataShark](#datashark)
   * [Getting Started](#getting-started)
+      * [The Installer Script](#the-installer-script)
       * [Installing Dependencies](#installing-dependencies)
       * [Running dataShark in Standalone Mode](#running-datashark-in-standalone-mode)
       * [Running dataShark in Production Mode](#running-datashark-in-production-mode)
@@ -30,6 +31,7 @@ Table of Contents
       * [1. Elasticsearch Output Plugin](#1-elasticsearch-output-plugin)
       * [2. Syslog Output Plugin](#2-syslog-output-plugin)
       * [3. CSV Output Plugin](#3-csv-output-plugin)
+  * [Uninstall dataShark](#uninstall-datashark)
   * [Contacts](#contacts)
   * [License](#license)
   * [Authors](#authors)
@@ -100,6 +102,24 @@ Following are the requirements for Production Mode Setup:
 3. Kafka
 4. Hadoop
 5. Fluent
+
+### The Installer Script
+
+Setting up dataShark to run in Standalone Mode is as easy as running the installer script. We now have the install.sh script that installs all required dependencies for dataShark Standalone Mode (to run the included wordcount use case). Following components get installed using the install.sh script:
+
+1. Spark 1.6.2
+2. Java 8u112
+3. Scala 2.11.8
+4. System Modules: git, gcc, Python Development Files, Python Setuptools
+5. Python Dependecies: py4j, configobj, argparse, numpy
+
+To run the install script, just execute the following command inside the cloned dataShark directory:
+
+```
+./install.sh
+```
+
+The install script, by default, installs all components to the directory /etc/datashark, but this can be overridden by providing the prefix flag like so: `./install.sh --prefix=/opt` will install to /opt/datashark.
 
 ### Installing Dependencies
 
@@ -283,8 +303,9 @@ Writing your own use cases using dataShark
 This document describes how to create your own use cases using dataShark. All custom code resides in the `conf` folder of dataShark.
 
 First create a folder with the use case name (all lower case characters and underscore only) in the conf folder. To write a new use case, at the bare minimum, we need 2 files in its own folder:
-> 1. The **.conf file**
-> 2. A code **.py file**
+
+1. The **.conf file**
+2. A code **.py file**
 
 The .conf file needs to define a few necessary flags specific to the use case and the .py file needs to implement the `load` function.
 
@@ -434,6 +455,31 @@ output = csv
         quote_char = '"'
         title = Use Case
         debug = false
+```
+
+Uninstall dataShark
+===================
+
+dataShark gets installed locally to /etc/datashark (default). If you had specified the prefix during install, the location might be different. An environment variable DATASHARK_HOME is set indicating the directory where dataShark resides. To uninstall dataShark, just remove the datashark directory by issuing the following command:
+
+```
+rm -fr $DATASHARK_HOME
+```
+
+> *Note*: Please take a backup of the conf folder before executing the above command to backup any custom use cases you may have placed in dataShark.  
+
+Some environment variables were also set in the bashrc file. You may remove the lines from `/etc/bashrc (for CentOS)` or `/etc/bash.bashrc (for Ubuntu)`. A typical installation adds the following lines to the bashrc file:
+
+```
+## ENVIRONMENT VARIABLES SET BY DATASHARK
+export JAVA_HOME=/etc/datashark/java
+export JRE_HOME=/etc/datashark/java/jre
+export PATH=$PATH:/etc/datashark/java/bin:/etc/datashark/java/jre/bin
+export PATH=$PATH:/etc/datashark/scala/bin
+export PATH=$PATH:/etc/datashark/spark/bin
+export SPARK_HOME=/etc/datashark/spark
+export PYTHONPATH=$SPARK_HOME/python:$PYTHONPATH
+## END OF VARIABLES BY DATASHARK
 ```
 
 Contacts
