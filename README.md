@@ -17,6 +17,7 @@ Table of Contents
       * [start.sh](#startsh)
       * [datashark_standalone.py](#datashark_standalonepy)
       * [datashark-env.sh](#datashark-envsh)
+      * [install.sh](#installsh)
       * [standalone.sh](#standalonesh)
       * [conf/](#conf)
       * [conf/wordcount/wordcount[.py|.conf|.txt]](#confwordcountwordcountpyconftxt)
@@ -248,6 +249,7 @@ dataShark/
 ├── datashark.py
 ├── datashark_standalone.py
 ├── datashark-env.sh
+├── install.sh
 ├── lib
 │   ├── elasticsearch-hadoop-2.2.0.jar
 │   └── spark-streaming-kafka-assembly-1.6.1.jar
@@ -278,6 +280,9 @@ This file is used for testing individual use cases before integrating them as pl
 
 ### datashark-env.sh
 This file gets loaded before execution of any Use Cases. Here you may place any required environment variables to be used by dataShark. One important variable to be set in this file is the SPARK_INSTANCE variable, that sets the spark master Host and Port.
+
+### install.sh
+The Installer Script for installing requirements required to run dataShark in Standalone Mode to execute the included wordcount use case.
 
 ### standalone.sh
 This script is the helper for datashark_standalone.py. This loads all environment variables for executing a Use Case. You can write an use case as usual and execute it using the command, `./standalone.sh conf/use_case_dir/sample_use_case.conf` to just execute that use case. This file ignores the enabled flag in the conf, so it is advised to keep the flag set to false while doing a dry run to avoid accidental execution of the use case.
