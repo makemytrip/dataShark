@@ -7,9 +7,11 @@ Table of Contents
   * [dataShark](#datashark)
   * [Getting Started](#getting-started)
       * [The Installer Script](#the-installer-script)
-      * [Installing Dependencies](#installing-dependencies)
-      * [Running dataShark in Standalone Mode](#running-datashark-in-standalone-mode)
-      * [Running dataShark in Production Mode](#running-datashark-in-production-mode)
+      * [The Docker Image](#the-docker-image)
+      * [The Manual Method](#the-manual-method)
+        * [Installing Dependencies](#installing-dependencies)
+        * [Running dataShark in Standalone Mode](#running-datashark-in-standalone-mode)
+        * [Running dataShark in Production Mode](#running-datashark-in-production-mode)
   * [Structure of dataShark](#structure-of-datashark)
     * [The Directory Structure](#the-directory-structure)
       * [datashark.py](#datasharkpy)
@@ -104,7 +106,7 @@ Following are the requirements for Production Mode Setup:
 4. Hadoop
 5. Fluent
 
-### The Installer Script
+## The Installer Script
 
 Setting up dataShark to run in Standalone Mode is as easy as running the installer script. We now have the install.sh script that installs all required dependencies for dataShark Standalone Mode (to run the included wordcount use case). Following components get installed using the install.sh script:
 
@@ -121,6 +123,19 @@ To run the install script, just execute the following command inside the cloned 
 ```
 
 The install script, by default, installs all components to the directory /etc/datashark, but this can be overridden by providing the prefix flag like so: `./install.sh --prefix=/opt` will install to /opt/datashark.
+
+## The Docker Image
+
+We wanted dataShark to be available as a ready-to-go package. Therefore, we also have a Docker Image with all dependencies and dataShark pre-installed on a base CentOS 6.8 to run the wordcount use case. The following commands can be used to pull dataShark Image from Docker Hub and drop into the image's shell:
+
+```
+docker pull makemytrip/datashark
+docker run -i -t makemytrip/datashark /bin/bash
+```
+
+That's it! You're now inside the CentOS shell. dataShark is installed in /etc/datashark.
+
+## The Manual Method
 
 ### Installing Dependencies
 
@@ -145,7 +160,7 @@ git clone https://github.com/makemytrip/dataShark.git
 After cloning, executing a use case in standalone mode is as easy as running the following command:
 
 ```
-./standalone.sh conf/use_case_dir/sample_use_case.conf
+./standalone.sh conf/wordcount/wordcount.conf
 ```
 
 Following is the sample output for a sample Standalone Mode run:
