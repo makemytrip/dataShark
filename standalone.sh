@@ -27,7 +27,8 @@ CDIR=`pwd`
 CODE_PATH=`ls conf/ | grep -v ".py" | xargs -i echo "$CDIR/conf/{}" | awk -vORS=: '{ print $1 }' | sed 's/:$/\n/'`
 
 # LOAD ENVIRONMENT
-/bin/bash datashark-env.sh
+source datashark-env.sh
+
 export PYTHONPATH=$SPARK_HOME/python:$CODE_PATH:$CDIR/plugins/output:$PYTHONPATH
 
 echo '                                                            '

@@ -23,7 +23,7 @@ WARN="[!]"
 INFO="[*]"
 
 # LOAD ENVIRONMENT
-/bin/bash datashark-env.sh
+source datashark-env.sh
 
 ## FLAG CHECKS
 while [[ $# -gt 0 ]]
