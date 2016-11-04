@@ -75,6 +75,15 @@ if __name__ == "__main__":
 	
 	config = ConfigObj("%s/datashark.conf" % CODE_DIR)
 
+	try:
+		DEBUG_MODE = sys.argv[2]
+		if DEBUG_MODE == "debug":
+			DEBUG_MODE = True
+		else:
+			DEBUG_MODE = False
+	except:
+		DEBUG_MODE = False
+
 	KAFKA_HOST = config.get('zookeeper.host', None)
 	KAFKA_PORT = config.get('zookeeper.port', None)
 	KAFKA_SRC = "%s:%s" % (KAFKA_HOST, KAFKA_PORT)
@@ -108,10 +117,13 @@ if __name__ == "__main__":
 				cfile = "/".join(cfile)
 				batchData = sc.textFile("%s/%s/%s" % (CODE_DIR, cfile, conf['file']))
 				dataRDD = loader.load(batchData)
-				output_module = conf['output']
-				output = locals()['out_%s' % output_module]
-				out_module = output.Plugin(conf[conf['output']])
-				out_module.save(dataRDD, conf['type'])
+				if DEBUG_MODE:
+					print dataRDD.collect()
+				else:
+					output_module = conf['output']
+					output = locals()['out_%s' % output_module]
+					out_module = output.Plugin(conf.get("out_%s" % conf['output'], {}))
+					out_module.save(dataRDD, conf['type'])
 
 	if RUN_STREAMING:
 		ssc = StreamingContext(sc, 1)
@@ -120,10 +132,21 @@ if __name__ == "__main__":
 		streamingData = KafkaUtils.createStream(ssc, KAFKA_SRC, KAFKA_CONSUMER_NAME, {KAFKA_QUEUE_NAME: KAFKA_PARTITIONS})
 		for cfile, conf in loaded.iteritems():
 			if conf['type'] == "streaming":
+				overrideStreamingData = None
+				if "input" in conf:
+					input_type = conf['input']
+					input_conf = conf["in_%s" % input_type]
+					if input_type == "kafka":
+						overrideStreamingData = KafkaUtils.createStream(ssc, "%s:%s" % (input_conf['host'], input_conf['port']), KAFKA_CONSUMER_NAME, {input_conf['topic']: int(input_conf['partitions'])})
+					elif input_type == "file":
+						overrideStreamingData = ssc.textFileStream(input_conf['folder_path'])
 				filename, extension = os.path.splitext(conf['code'])
 				loader = __import__(filename)
 				filters = conf.get('log_filter', None)
-				localStream = streamingData
+				if overrideStreamingData:
+					localStream = overrideStreamingData
+				else:
+					localStream = streamingData
 				if filters:
 					localStream = localStream.filter(lambda line: logFilter(line, filters))
 				print " - Starting %s" % conf['name']
@@ -134,10 +157,12 @@ if __name__ == "__main__":
                                 cfile = "/".join(cfile)
 				trainingData = sc.textFile("%s/%s/%s" % (CODE_DIR, cfile, conf['training']))
 				dataRDD = loader.load(localStream, trainingData, context = sc)
-				
-				output = locals()['out_%s' % output_module]
-				out_module = output.Plugin(conf.get(conf['output'], {}))
-				out_module.save(dataRDD, conf['type'])
+				if DEBUG_MODE:
+					dataRDD.pprint()
+				else:		
+					output = locals()['out_%s' % output_module]
+					out_module = output.Plugin(conf.get("out_%s" % conf['output'], {}))
+					out_module.save(dataRDD, conf['type'])
 
 		ssc.start()
 		ssc.awaitTermination()

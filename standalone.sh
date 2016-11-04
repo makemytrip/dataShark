@@ -29,6 +29,25 @@ CODE_PATH=`ls conf/ | grep -v ".py" | xargs -i echo "$CDIR/conf/{}" | awk -vORS=
 # LOAD ENVIRONMENT
 source datashark-env.sh
 
+DEBUG=""
+
+while getopts ":d:" opt; do
+  case $opt in
+    d)
+      DEBUG="debug"
+      CODEFILE=$OPTARG
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
 export PYTHONPATH=$SPARK_HOME/python:$CODE_PATH:$CDIR/plugins/output:$PYTHONPATH
 
 echo '                                                            '
@@ -40,9 +59,14 @@ echo '        \__,_/\__,_/\__/\__,_//____/_/ /_/\__,_/_/  /_/|_|  '
 echo '                                                            '
 echo '                          STANDALONE MODE                   '
 echo '                                                            '
-echo '                               v1.0                         '
+echo '                               v1.1                         '
 echo '                                                            '
 echo '                                                            '
+      
+if [ "x$DEBUG" == "x" ]; then
+	CODEFILE=$1
+else	
+	echo "$INFO Debug Mode is ON" >&2
+fi
 
-
-spark-submit --jars $JARS --master local[*] --executor-memory 4G --driver-memory 2G datashark_standalone.py $1
+spark-submit --jars $JARS --master local[*] --executor-memory 4G --driver-memory 2G datashark_standalone.py $CODEFILE $DEBUG

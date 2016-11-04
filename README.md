@@ -34,6 +34,9 @@ Table of Contents
       * [1. Elasticsearch Output Plugin](#1-elasticsearch-output-plugin)
       * [2. Syslog Output Plugin](#2-syslog-output-plugin)
       * [3. CSV Output Plugin](#3-csv-output-plugin)
+  * [Input Plugins](#input-plugins)
+      * [1. Kafka Input Plugin](#1-kafka-input-plugin)
+      * [2. File Input Plugin](#2-file-input-plugin)
   * [Uninstall dataShark](#uninstall-datashark)
   * [Contacts](#contacts)
   * [License](#license)
@@ -175,11 +178,38 @@ Following is the sample output for a sample Standalone Mode run:
 
                           STANDALONE MODE
 
-                               v1.0
+                               v1.1
 
 
 Loaded Confs: ['conf/wordcount/wordcount.conf']
 2016-10-14 13:01:39 - (Word Count) - Written 1384 Documents to CSV File /tmp/usecase1.csv
+```
+
+The Standalone Mode now also provides a debugging feature, where the output is not passed to the output plugin, rather printed out on the console using collect() for batch mode use cases and pprint() for streaming use cases. This can help in quickly debugging a use case than having to use the output plugin. The debug mode can be turned on using the `-d` flag and passing the conf file as given below:
+
+```
+./standalone.sh -d conf/wordcount/wordcount.conf
+```
+
+Following is the sample output for a sample Standalone Mode run in debugging mode:
+
+```
+
+               __      __        _____ __               __
+          ____/ /___ _/ /_____ _/ ___// /_  ____ ______/ /__
+         / __  / __ `/ __/ __ `/\__ \/ __ \/ __ `/ ___/ //_/
+        / /_/ / /_/ / /_/ /_/ /___/ / / / / /_/ / /  / ,<
+        \__,_/\__,_/\__/\__,_//____/_/ /_/\__,_/_/  /_/|_|
+
+                          STANDALONE MODE
+
+                               v1.1
+
+
+[*] Debug Mode is ON
+Loaded Confs: ['conf/wordcount/wordcount.conf']
+[(u'all', 20), (u'moreover,', 1), (u'"recipients"', 1), (u'(if', 3), (u'party.', 1), (u'procuring', 1), (u'provided,', 1), (u'methods,', 1), (u'versions.', 2), (u'presents', 1), (u'violation', 5), (u'charge', 5), (u'permanently', 3), (u'those', 14)
+...
 ```
 
 ### Running dataShark in Production Mode
@@ -229,7 +259,7 @@ Following is the sample output of the first run:
 
                           PRODUCTION MODE
 
-                               v1.0
+                               v1.1
 
 
 [*] 2016-10-12 14:59:06 Running Spark on Cluster
@@ -341,12 +371,18 @@ code = code.py
 enabled = true
 training = training.log
 output = elasticsearch
+input = kafka
+[in_kafka]
+	host = 127.0.0.1
+        port = 2181
+        topic = logs_queue
+        partitions = 1
 [log_filter]
         [[include]]
                 some_key = ^regex pattern$
         [[exclude]]
                 some_other_key = ^regex pattern$
-[elasticsearch]
+[out_elasticsearch]
         host = 10.0.0.1
         port = 9200
         index_name = logstash-index
@@ -373,6 +409,8 @@ output : The output plugin to use. Types of output plugins are listed below.
 ### Optional Keys
 
 ```
+input : This key is used to override the Global Kafka Stream. This can be either `kafka` or `file`.
+[in_file] or [in_kafka] : This is used to specify the input conf to override the Glocal Kafka Stream.
 [log_filter] : This is used to filter out the Kafka stream passed to your use case. It has the following two optional sub-sections:
     - [[include]] : In this sub-section each key value pair is used to filter the incoming log stream to include in the use case. The *key* is the name of the key in the JSON Document in the Kafka Stream. The *value* has to be a regex pattern that matches the content of that key.
     - [[exclude]] : In this sub-section each key value pair is used to filter the incoming log stream to exclude from the use case. The *key* is the name of the key in the JSON Document in the Kafka Stream. The *value* has to be a regex pattern that matches the content of that key.
@@ -414,7 +452,7 @@ dataShark provides the following 3 output plugins out-of-the-box for processed d
 2. Syslog
 3. CSV
 
-Each of this plugin requires its own basic set of settings, described below.
+Each of these plugins requires its own basic set of settings, described below.
 
 ### 1. Elasticsearch Output Plugin
 
@@ -424,7 +462,7 @@ Following is the basic template for configuring Elasticsearch output plugin:
 
 ```
 output = elasticsearch
-[elasticsearch]
+[out_elasticsearch]
         host = 127.0.0.1
         port = 9200
         index_name = usecase
@@ -452,7 +490,7 @@ The Syslog Output plugin outputs JSON documents to the specified Syslog Server I
 
 ```
 output = syslog
-[syslog]
+[out_syslog]
         host = 127.0.0.1
         port = 514
         pkey = source_ip
@@ -469,13 +507,48 @@ The CSV Output Plugins writes and appends output from Spark Use Case to a specif
 
 ```
 output = csv
-[csv]
+[out_csv]
         path = UseCase.csv
         separator = ,
         quote_char = '"'
         title = Use Case
         debug = false
 ```
+
+Input Plugins
+=============
+
+dataShark allows different inputs to be used per use case. These can be used to override the Global Kafka Stream per use case. Currently, only two plugins are provided:
+
+1. Kafka
+2. File
+
+Each of these plugins requires its own basic set of settings, described below.
+
+### 1. Kafka Input Plugin
+
+This plugin can be used to specify a different Kafka Queue or a totally different Kafka Host to pickup the input stream from. The plugin has some mandatory configuration. A sample configuration is given below and can be modified as per need:
+
+```
+[in_kafka]
+        host = 127.0.0.1
+        port = 2181
+        topic = logs_queue
+        partitions = 1
+```
+
+All keys are mandatory and need to be defined.
+
+### 2. File Input Plugin
+
+This plugin can be used to pickup the input stream from a local folder (as suggested by Spark). The folder is monitored for any new files and loads the data from them. The plugin has some mandatory configuration. A sample configuration is given below and can be modified as per need:
+
+```
+[in_file]
+        folder_path = /tmp/mydata
+```
+
+All keys are mandatory and need to be defined.
 
 Uninstall dataShark
 ===================
@@ -492,6 +565,7 @@ Some environment variables were also set in the bashrc file. You may remove the 
 
 ```
 ## ENVIRONMENT VARIABLES SET BY DATASHARK
+export DATASHARK_HOME=/etc/datashark
 export JAVA_HOME=/etc/datashark/java
 export JRE_HOME=/etc/datashark/java/jre
 export PATH=$PATH:/etc/datashark/java/bin:/etc/datashark/java/jre/bin
