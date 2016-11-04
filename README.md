@@ -410,7 +410,7 @@ output : The output plugin to use. Types of output plugins are listed below.
 
 ```
 input : This key is used to override the Global Kafka Stream. This can be either `kafka` or `file`.
-[in_file] or [in_kafka] : This is used to specify the input conf to override the Glocal Kafka Stream.
+[in_file] or [in_kafka] : This is used to specify the input conf to override the Global Kafka Stream.
 [log_filter] : This is used to filter out the Kafka stream passed to your use case. It has the following two optional sub-sections:
     - [[include]] : In this sub-section each key value pair is used to filter the incoming log stream to include in the use case. The *key* is the name of the key in the JSON Document in the Kafka Stream. The *value* has to be a regex pattern that matches the content of that key.
     - [[exclude]] : In this sub-section each key value pair is used to filter the incoming log stream to exclude from the use case. The *key* is the name of the key in the JSON Document in the Kafka Stream. The *value* has to be a regex pattern that matches the content of that key.
