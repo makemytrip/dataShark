@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>dataShark by makemytrip</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">dataShark</h1>
+      <h2 class="project-tagline">dataShark is a Security &amp; Network Event Analytics Framework built on Apache Spark</h2>
+      <a href="https://github.com/makemytrip/dataShark" class="btn">View on GitHub</a>
+      <a href="https://github.com/makemytrip/dataShark/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/makemytrip/dataShark/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="welcome-to-datashark" class="anchor" href="#welcome-to-datashark" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Welcome to dataShark</h1>
+
+<h2>
+<a id="table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Table of Contents</h2>
+
+<ul>
+<li><a href="#datashark">dataShark</a></li>
+<li>
+<a href="#getting-started">Getting Started</a>
+
+<ul>
+<li><a href="#the-installer-script">The Installer Script</a></li>
+<li><a href="#the-docker-image">The Docker Image</a></li>
+<li>
+<a href="#the-manual-method">The Manual Method</a>
+
+<ul>
+<li><a href="#installing-dependencies">Installing Dependencies</a></li>
+<li><a href="#running-datashark-in-standalone-mode">Running dataShark in Standalone Mode</a></li>
+<li><a href="#running-datashark-in-production-mode">Running dataShark in Production Mode</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="#structure-of-datashark">Structure of dataShark</a>
+
+<ul>
+<li>
+<a href="#the-directory-structure">The Directory Structure</a>
+
+<ul>
+<li><a href="#datasharkpy">datashark.py</a></li>
+<li><a href="#datasharkconf">datashark.conf</a></li>
+<li><a href="#startsh">start.sh</a></li>
+<li><a href="#datashark_standalonepy">datashark_standalone.py</a></li>
+<li><a href="#datashark-envsh">datashark-env.sh</a></li>
+<li><a href="#installsh">install.sh</a></li>
+<li><a href="#standalonesh">standalone.sh</a></li>
+<li><a href="#conf">conf/</a></li>
+<li><a href="#confwordcountwordcountpyconftxt">conf/wordcount/wordcount[.py|.conf|.txt]</a></li>
+<li><a href="#lib">lib/</a></li>
+<li><a href="#pluginsoutput">plugins/output/</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="#writing-your-own-use-cases-using-datashark">Writing your own use cases using dataShark</a>
+
+<ul>
+<li>
+<a href="#the-conf-file">The .conf File</a>
+
+<ul>
+<li><a href="#required-keys">Required Keys</a></li>
+<li><a href="#optional-keys">Optional Keys</a></li>
+</ul>
+</li>
+<li><a href="#the-py-file">The .py file</a></li>
+</ul>
+</li>
+<li>
+<a href="#output-plugins">Output Plugins</a>
+
+<ul>
+<li><a href="#1-elasticsearch-output-plugin">1. Elasticsearch Output Plugin</a></li>
+<li><a href="#2-syslog-output-plugin">2. Syslog Output Plugin</a></li>
+<li><a href="#3-csv-output-plugin">3. CSV Output Plugin</a></li>
+</ul>
+</li>
+<li>
+<a href="#input-plugins">Input Plugins</a>
+
+<ul>
+<li><a href="#1-kafka-input-plugin">1. Kafka Input Plugin</a></li>
+<li><a href="#2-file-input-plugin">2. File Input Plugin</a></li>
+</ul>
+</li>
+<li><a href="#uninstall-datashark">Uninstall dataShark</a></li>
+<li><a href="#changelog">Changelog</a></li>
+<li><a href="#contacts">Contacts</a></li>
+<li><a href="#license">License</a></li>
+<li><a href="#authors">Authors</a></li>
+</ul>
+
+<h1>
+<a id="datashark" class="anchor" href="#datashark" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>dataShark</h1>
+
+<p>dataShark is a Security &amp; Network Event Analytics Framework built on Apache Spark that enables security researchers, big data analysts and operations teams to carry out the below tasks with minimal effort:</p>
+
+<ol>
+<li>Data ingest from various sources such as file system, Syslog, Kafka.</li>
+<li>Write custom map / reduce and ML algorithms that operate on ingested data using abstracted Apache Spark functionality.</li>
+<li>The output of the above operations can be sent to destinations such as syslog, elasticsearch and can also be persisted in the file system or HDFS.</li>
+</ol>
+
+<p>dataShark has the following two operation modes:</p>
+
+<ol>
+<li>
+<strong>Standalone executable</strong>: allows one-shot analysis of static data (input can be file system or HDFS and output can be any of the available output plugins - Syslog, Elasticsearch, file system, HDFS).</li>
+<li>
+<strong>Production</strong>: full-fledged production deployment with all components (refer next section) that can ingest data from the mentioned sources.</li>
+</ol>
+
+<p>We recommend the following components while running dataShark in production:</p>
+
+<ol>
+<li>
+<em>Event Acquisition</em>: this layer leverages Fluentd for processing events via syslog, parsing them as per user-defined grok patterns and forwarding the same to Kafka for queuing.</li>
+<li>
+<em>Event Queuing</em>: this layer uses Kafka to queue events for Spark to process. Often useful when the input EPS is high and the Spark layer has a delay in processing.</li>
+<li>
+<em>Core Data Engine</em>: this is the core dataShark framework built on Spark. A user can deploy custom map / reduce or ML use cases and submit the output via any available output plugin.</li>
+<li>
+<em>Persistence Layer</em>: elasticsearch and HDFS are leveraged to persist output and lookup data as required.</li>
+<li>
+<em>Alerting Engine</em>: this uses ElastAlert to monitor output data and configure custom rules / thresholds to generate alerts.</li>
+<li>
+<em>Output Plugins</em>: these are used by the Core Data Engine to persist or send its output to various destinations such as CSV, Syslog or Elasticsearch.</li>
+</ol>
+
+<blockquote>
+<p><em>Note</em>: 1, 2, 4 and 5 are purely basis our experience with the production setup. One is free to use any available alternative.</p>
+</blockquote>
+
+<p><a href=""><img src="https://makemytrip.github.io/images/dataShark_arch.jpg" alt=""></a></p>
+
+<p><strong>Input Data Sources:</strong></p>
+
+<ol>
+<li>
+<em>File system</em>: static files to carry out one-time analysis or to train data models for ML.</li>
+<li>
+<em>Kafka</em>: stream data that is ingested using Spark stream processing capabilities.</li>
+</ol>
+
+<p><strong>Output plugins:</strong></p>
+
+<ol>
+<li>
+<em>CSV (File system or HDFS)</em>: persist output data in CSV file format on the file system or HDFS.</li>
+<li>
+<em>Syslog</em>: send output data to a remote syslog server.</li>
+<li>
+<em>Elasticsearch</em>: persist output data in elasticsearch.</li>
+</ol>
+
+<p><strong>Sample use cases / implementations:</strong></p>
+
+<ol>
+<li>Detecting bots or anomalous server behavior using K-means classification and anomaly detection techniques.</li>
+<li>Generating a summary of websites accessed using map / reduce on web proxy logs.</li>
+<li>Generating a summary of web and network traffic using map / reduce on Apache HTTPD and firewall logs.</li>
+</ol>
+
+<h1>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h1>
+
+<p>This section describes how to get started with dataShark. Before you can actually run dataShark, there are some prerequisites that need to be installed. </p>
+
+<p>dataShark can run in 2 modes:</p>
+
+<ol>
+<li>Standalone Mode</li>
+<li>Production Mode</li>
+</ol>
+
+<p>Following are the requirements for Standlone Mode Setup:</p>
+
+<ol>
+<li>pySpark</li>
+<li>Python Dependencies</li>
+</ol>
+
+<p>Following are the requirements for Production Mode Setup:</p>
+
+<ol>
+<li>pySpark</li>
+<li>Python Dependencies</li>
+<li>Kafka</li>
+<li>Hadoop</li>
+<li>Fluent</li>
+</ol>
+
+<h2>
+<a id="the-installer-script" class="anchor" href="#the-installer-script" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The Installer Script</h2>
+
+<p>Setting up dataShark to run in Standalone Mode is as easy as running the installer script. We now have the install.sh script that installs all required dependencies for dataShark Standalone Mode (to run the included wordcount use case). Following components get installed using the install.sh script:</p>
+
+<ol>
+<li>Spark 1.6.2</li>
+<li>Java 8u112</li>
+<li>Scala 2.11.8</li>
+<li>System Modules: git, gcc, Python Development Files, Python Setuptools</li>
+<li>Python Dependecies: py4j, configobj, argparse, numpy</li>
+</ol>
+
+<p>To run the install script, just execute the following command inside the cloned dataShark directory:</p>
+
+<pre><code>./install.sh
+</code></pre>
+
+<p>The install script, by default, installs all components to the directory /etc/datashark, but this can be overridden by providing the prefix flag like so: <code>./install.sh --prefix=/opt</code> will install to /opt/datashark.</p>
+
+<h2>
+<a id="the-docker-image" class="anchor" href="#the-docker-image" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The Docker Image</h2>
+
+<p>We wanted dataShark to be available as a ready-to-go package. Therefore, we also have a Docker Image with all dependencies and dataShark pre-installed on a base CentOS 6.8 to run the wordcount use case. The following commands can be used to pull dataShark Image from Docker Hub and drop into the image's shell:</p>
+
+<pre><code>docker pull makemytrip/datashark
+docker run -i -t makemytrip/datashark /bin/bash
+</code></pre>
+
+<p>That's it! You're now inside the CentOS shell. dataShark is installed in /etc/datashark.</p>
+
+<h2>
+<a id="the-manual-method" class="anchor" href="#the-manual-method" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The Manual Method</h2>
+
+<h3>
+<a id="installing-dependencies" class="anchor" href="#installing-dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing Dependencies</h3>
+
+<ol>
+<li>
+<strong>pySpark</strong> is the brains of dataShark. We recommend installing Spark with Oracle's Java &gt;= 1.8.0. Use the following link to setup up pySpark: <a href="https://github.com/KristianHolsheimer/pyspark-setup-guide">https://github.com/KristianHolsheimer/pyspark-setup-guide</a>. This document provides the easiest method of setting up Spark with pySpark.
+
+<ul>
+<li>
+<em>[Optional]</em> Setting up Spark Cluster: Although it is highly recommended for better performance to setup Spark Cluster, this step is completely optional basis infrastructure availability. Following link provides steps to setup a basic Spark Cluster: <a href="http://blog.insightdatalabs.com/spark-cluster-step-by-step/">http://blog.insightdatalabs.com/spark-cluster-step-by-step/</a>.</li>
+<li>
+<em>Note</em>: It is required to set the SPARK_HOME environment variable. Make sure you set it as mentioned in the install guide mentioned above.</li>
+</ul>
+</li>
+<li>
+<strong>Python Dependencies</strong> are needed to be installed to run dataShark. To install the required dependencies, run the following command: <code>pip install configobj argparse</code>
+</li>
+<li>
+<strong>Kafka</strong> provides the high throughput message queue functionality which gets loaded to dataShark as a continuous stream for analysis. Kafka can be setup either with multiple brokers across multiple nodes or on a single node with multiple brokers, the basic setup steps are fairly the same for both methods. Following link can be used to setup multiple brokers on a single node: <a href="http://www.michael-noll.com/blog/2013/03/13/running-a-multi-broker-apache-kafka-cluster-on-a-single-node/">http://www.michael-noll.com/blog/2013/03/13/running-a-multi-broker-apache-kafka-cluster-on-a-single-node/</a>.</li>
+<li>
+<strong>Hadoop</strong> is the resilient storage for spark that's used for checkpointing and also as a driver for starting up dataShark with all dependencies. Following link provides steps to setup a multi-node Hadoop Cluster: <a href="http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-multi-node-cluster/">http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-multi-node-cluster/</a>.</li>
+<li>
+<strong>Fluentd</strong> is the data aggregator that collects logs from multiple sources and sends them to Kafka for consumption. Setting up fluentd is pretty easy. Fluentd's website provides steps for installation for all platforms. The Installation document can be found here: <a href="http://docs.fluentd.org/v0.12/categories/installation">http://docs.fluentd.org/v0.12/categories/installation</a>.</li>
+</ol>
+
+<h3>
+<a id="running-datashark-in-standalone-mode" class="anchor" href="#running-datashark-in-standalone-mode" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running dataShark in Standalone Mode</h3>
+
+<p>dataShark has a standalone mode for testing out use cases before plugging them in. The basic requirement to get dataShark running in standalone mode is having Apache Spark installed on the system hosting dataShark. </p>
+
+<p>Once we have all these prerequisites setup, to run dataShark in Standalone Mode you first need to clone this git repository:</p>
+
+<pre><code>git clone https://github.com/makemytrip/dataShark.git
+</code></pre>
+
+<p>After cloning, executing a use case in standalone mode is as easy as running the following command:</p>
+
+<pre><code>./standalone.sh conf/wordcount/wordcount.conf
+</code></pre>
+
+<p>Following is the sample output for a sample Standalone Mode run:</p>
+
+<pre><code>
+               __      __        _____ __               __
+          ____/ /___ _/ /_____ _/ ___// /_  ____ ______/ /__
+         / __  / __ `/ __/ __ `/\__ \/ __ \/ __ `/ ___/ //_/
+        / /_/ / /_/ / /_/ /_/ /___/ / / / / /_/ / /  / ,&lt;
+        \__,_/\__,_/\__/\__,_//____/_/ /_/\__,_/_/  /_/|_|
+
+                          STANDALONE MODE
+
+                               v1.1
+
+
+Loaded Confs: ['conf/wordcount/wordcount.conf']
+2016-10-14 13:01:39 - (Word Count) - Written 1384 Documents to CSV File /tmp/usecase1.csv
+</code></pre>
+
+<p>The Standalone Mode now also provides a debugging feature, where the output is not passed to the output plugin, rather printed out on the console using collect() for batch mode use cases and pprint() for streaming use cases. This can help in quickly debugging a use case than having to use the output plugin. The debug mode can be turned on using the <code>-d</code> flag and passing the conf file as given below:</p>
+
+<pre><code>./standalone.sh -d conf/wordcount/wordcount.conf
+</code></pre>
+
+<p>Following is the sample output for a sample Standalone Mode run in debugging mode:</p>
+
+<pre><code>
+               __      __        _____ __               __
+          ____/ /___ _/ /_____ _/ ___// /_  ____ ______/ /__
+         / __  / __ `/ __/ __ `/\__ \/ __ \/ __ `/ ___/ //_/
+        / /_/ / /_/ / /_/ /_/ /___/ / / / / /_/ / /  / ,&lt;
+        \__,_/\__,_/\__/\__,_//____/_/ /_/\__,_/_/  /_/|_|
+
+                          STANDALONE MODE
+
+                               v1.1
+
+
+[*] Debug Mode is ON
+Loaded Confs: ['conf/wordcount/wordcount.conf']
+[(u'all', 20), (u'moreover,', 1), (u'"recipients"', 1), (u'(if', 3), (u'party.', 1), (u'procuring', 1), (u'provided,', 1), (u'methods,', 1), (u'versions.', 2), (u'presents', 1), (u'violation', 5), (u'charge', 5), (u'permanently', 3), (u'those', 14)
+...
+</code></pre>
+
+<h3>
+<a id="running-datashark-in-production-mode" class="anchor" href="#running-datashark-in-production-mode" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running dataShark in Production Mode</h3>
+
+<p>Once we have all these prerequisites setup, to run dataShark in Production Mode you first need to clone this git repository:</p>
+
+<pre><code>git clone https://github.com/makemytrip/dataShark.git
+</code></pre>
+
+<p>Then we need to change the <code>datashark.conf</code> to specify the Zookeeper Host, Kafka Topic Name and HDFS Host Information. An example of sample configuration is given below:</p>
+
+<pre><code>zookeeper.host = 127.0.0.1
+zookeeper.port = 2181
+
+kafka.consumer.name = consumer-datashark
+kafka.queue.name = logs_queue
+kafka.partitions = 1
+
+hdfs.host = 127.0.0.1
+hdfs.port = 9000
+</code></pre>
+
+<p>Then we need to specify the Spark Master in datashark-env.sh:</p>
+
+<pre><code>SPARK_INSTANCE=spark://127.0.0.1:7077
+</code></pre>
+
+<p>This is all that is needed to install and configure datashark. To start the spark engine and use cases, we can simply run the command:</p>
+
+<pre><code>./start.sh
+</code></pre>
+
+<p>On the first run, we only have the Word Count Use Case enabled that will be run.
+Following is the sample output of the first run:</p>
+
+<pre><code>
+               __      __        _____ __               __
+          ____/ /___ _/ /_____ _/ ___// /_  ____ ______/ /__
+         / __  / __ `/ __/ __ `/\__ \/ __ \/ __ `/ ___/ //_/
+        / /_/ / /_/ / /_/ /_/ /___/ / / / / /_/ / /  / ,&lt;
+        \__,_/\__,_/\__/\__,_//____/_/ /_/\__,_/_/  /_/|_|
+
+                          PRODUCTION MODE
+
+                               v1.1
+
+
+[*] 2016-10-12 14:59:06 Running Spark on Cluster
+[*] 2016-10-12 14:59:06 Preparing FileSystem
+[*] 2016-10-12 14:59:12 Starting Spark
+Loaded Confs: ['/opt/dataShark/conf/wordcount/wordcount.conf']
+2016-10-12 14:59:21 - (Word Count) - Written 1384 Documents to CSV File /tmp/usecase1.csv
+ * Skip Stream Processing
+[*] 2016-10-12 14:59:23 Cleaning Up
+</code></pre>
+
+<h1>
+<a id="structure-of-datashark" class="anchor" href="#structure-of-datashark" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Structure of dataShark</h1>
+
+<p>This section describes the structure of directories and files.</p>
+
+<h2>
+<a id="the-directory-structure" class="anchor" href="#the-directory-structure" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The Directory Structure</h2>
+
+<p>Following is the basic directory structure of dataShark after deployment.</p>
+
+<pre><code>dataShark/
+├── conf
+│   ├── __init__.py
+│   └── wordcount
+│       ├── __init__.py
+│       ├── wordcount.conf
+│       ├── wordcount.py
+│       └── wordcount.txt
+├── datashark.conf
+├── datashark.py
+├── datashark_standalone.py
+├── datashark-env.sh
+├── install.sh
+├── lib
+│   ├── elasticsearch-hadoop-2.2.0.jar
+│   └── spark-streaming-kafka-assembly-1.6.1.jar
+├── plugins
+│   ├── __init__.py
+│   └── output
+│       ├── __init__.py
+│       ├── out_csv.py
+│       ├── out_elasticsearch.py
+│       └── out_syslog.py
+├── start.sh
+└── standalone.sh
+</code></pre>
+
+<p>Files and directories have been explained below:</p>
+
+<h3>
+<a id="datasharkpy" class="anchor" href="#datasharkpy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>datashark.py</h3>
+
+<p>The heart of dataShark, this is where the magic happens. When using dataShark, you will <em>never</em> have to change the contents of this file.</p>
+
+<h3>
+<a id="datasharkconf" class="anchor" href="#datasharkconf" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>datashark.conf</h3>
+
+<p>The main configuration file which specifies the Kafka Queue to be consumed for Streaming Use Cases.</p>
+
+<h3>
+<a id="startsh" class="anchor" href="#startsh" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>start.sh</h3>
+
+<p>The shell file that is used to start up spark with all its dependencies and use cases.</p>
+
+<h3>
+<a id="datashark_standalonepy" class="anchor" href="#datashark_standalonepy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>datashark_standalone.py</h3>
+
+<p>This file is used for testing individual use cases before integrating them as plugins to dataShark. </p>
+
+<h3>
+<a id="datashark-envsh" class="anchor" href="#datashark-envsh" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>datashark-env.sh</h3>
+
+<p>This file gets loaded before execution of any Use Cases. Here you may place any required environment variables to be used by dataShark. One important variable to be set in this file is the SPARK_INSTANCE variable, that sets the spark master Host and Port.</p>
+
+<h3>
+<a id="installsh" class="anchor" href="#installsh" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>install.sh</h3>
+
+<p>The Installer Script for installing requirements required to run dataShark in Standalone Mode to execute the included wordcount use case.</p>
+
+<h3>
+<a id="standalonesh" class="anchor" href="#standalonesh" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>standalone.sh</h3>
+
+<p>This script is the helper for datashark_standalone.py. This loads all environment variables for executing a Use Case. You can write an use case as usual and execute it using the command, <code>./standalone.sh conf/use_case_dir/sample_use_case.conf</code> to just execute that use case. This file ignores the enabled flag in the conf, so it is advised to keep the flag set to false while doing a dry run to avoid accidental execution of the use case.</p>
+
+<h3>
+<a id="conf" class="anchor" href="#conf" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>conf/</h3>
+
+<p>This directory is where all use cases are placed. Refer to <a href="#writing-your-own-use-cases-using-datashark">Writing your own use cases using dataShark</a> on how to write your own plugin use cases.</p>
+
+<h3>
+<a id="confwordcountwordcountpyconftxt" class="anchor" href="#confwordcountwordcountpyconftxt" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>conf/wordcount/wordcount[.py|.conf|.txt]</h3>
+
+<p>Wordcount is a sample use case provided with dataShark for trying out batch processing. The wordcount.txt file is a standard GNUv3 License file.</p>
+
+<h3>
+<a id="lib" class="anchor" href="#lib" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>lib/</h3>
+
+<p>Any external jar dependencies that need to be included with spark for your use cases. Out of the box, we provide you 2 jars included with datashark, Spark Streaming Kafka Library and Elasticsearch Library.</p>
+
+<h3>
+<a id="pluginsoutput" class="anchor" href="#pluginsoutput" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>plugins/output/</h3>
+
+<p>All output plugins are placed in this directory. The naming convention for files in this directory is <code>out_&lt;plugin name&gt;.py</code>, example, out_csv.py. Three output plugins are provided out of the box:
+1. Elasticsearch
+2. Syslog
+3. CSV</p>
+
+<h1>
+<a id="writing-your-own-use-cases-using-datashark" class="anchor" href="#writing-your-own-use-cases-using-datashark" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Writing your own use cases using dataShark</h1>
+
+<p>This document describes how to create your own use cases using dataShark. All custom code resides in the <code>conf</code> folder of dataShark.</p>
+
+<p>First create a folder with the use case name (all lower case characters and underscore only) in the conf folder. To write a new use case, at the bare minimum, we need 2 files in its own folder:</p>
+
+<ol>
+<li>The <strong>.conf file</strong>
+</li>
+<li>A code <strong>.py file</strong>
+</li>
+</ol>
+
+<p>The .conf file needs to define a few necessary flags specific to the use case and the .py file needs to implement the <code>load</code> function.</p>
+
+<h2>
+<a id="the-conf-file" class="anchor" href="#the-conf-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The .conf File</h2>
+
+<p>This is what a standard .conf file looks like:</p>
+
+<pre><code>name = Use Case 1
+type = streaming
+code = code.py
+enabled = true
+training = training.log
+output = elasticsearch
+input = kafka
+[in_kafka]
+    host = 127.0.0.1
+        port = 2181
+        topic = logs_queue
+        partitions = 1
+[log_filter]
+        [[include]]
+                some_key = ^regex pattern$
+        [[exclude]]
+                some_other_key = ^regex pattern$
+[out_elasticsearch]
+        host = 10.0.0.1
+        port = 9200
+        index_name = logstash-index
+        doc_type = docs
+        pkey = sourceip
+        score = anomaly_score
+        title = Name for ES Document
+        debug = false
+</code></pre>
+
+<h3>
+<a id="required-keys" class="anchor" href="#required-keys" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Required Keys</h3>
+
+<pre><code>name : Name for the Use Case.
+type : This can be either of **batch** or **streaming**. When using *batch* mode, the use case is run just once on the provided data file. In *streaming* mode a Kafka Stream is passed to the code file to analyze.
+enabled : Set this to either **true** or **false** to simply enable or disable this use case.
+code : The .py file corresponding to this use case.
+training : The log file to supply as training data to train your model. This is required only when `type = streaming`. (In batch mode, this key can be skipped)
+file : The data file to use for *batch* processing. This is required only when `type = batch`. (In streaming mode, this key can be skipped)
+output : The output plugin to use. Types of output plugins are listed below.
+[type_of_plugin] : The settings for the output plugin being used.
+</code></pre>
+
+<h3>
+<a id="optional-keys" class="anchor" href="#optional-keys" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Optional Keys</h3>
+
+<pre><code>input : This key is used to override the Global Kafka Stream. This can be either `kafka` or `file`.
+[in_file] or [in_kafka] : This is used to specify the input conf to override the Global Kafka Stream.
+[log_filter] : This is used to filter out the Kafka stream passed to your use case. It has the following two optional sub-sections:
+    - [[include]] : In this sub-section each key value pair is used to filter the incoming log stream to include in the use case. The *key* is the name of the key in the JSON Document in the Kafka Stream. The *value* has to be a regex pattern that matches the content of that key.
+    - [[exclude]] : In this sub-section each key value pair is used to filter the incoming log stream to exclude from the use case. The *key* is the name of the key in the JSON Document in the Kafka Stream. The *value* has to be a regex pattern that matches the content of that key.
+</code></pre>
+
+<h2>
+<a id="the-py-file" class="anchor" href="#the-py-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The .py file</h2>
+
+<p>The .py file is the brains of the system. This is where all the map-reduce. model training happens. The user needs to implement a method named <code>load</code> in this .py file. dataShark provides two flavors of the load function to implement, one for streaming and one for batch processing. Following is the basic definition of the load function of each type:</p>
+
+<p><em>For batch processing:</em></p>
+
+<pre><code>def load(batchData)
+</code></pre>
+
+<p>The data file provided as input in the .conf file is loaded and passed to the function in the variable batchData. batchData is of type <code>PythonRDD</code>.</p>
+
+<p><em>For stream processing:</em></p>
+
+<pre><code>def load(streamingData, trainingData, context)
+</code></pre>
+
+<p><code>streamingData</code> is the Kafka Stream being sent to the function load. This is of type <em>DStream</em>.
+<code>trainingData</code> is the Training File loaded from the <em>training</em> key mention in the .conf file. It is of the type <em>PythonRDD</em>.
+<code>context</code> is the spark context loaded in the driver. It may be used for using the accumulator, etc.</p>
+
+<p>The function <code>load</code> expects a processed <em>DStream</em> to be returned from it. Each RDD in the DStream should be in the following format (this format is necessary for usability in output plugins):
+<code>('primary_key', anomaly_score, {"some_metadata": "dictionary here"})</code></p>
+
+<p><em>primary_key</em> is a string. It is the tagging metric by which the data was aggregated for map-reduce and finally scored.
+<em>anomaly_score</em> is of type float. It is the value used to define the deviation from normal behavior.
+<em>metadata</em> is of the type dictionary. This is the extra data that needs to be inserted into the Elasticsearch document or added to the CSV as extra Columns.</p>
+
+<h1>
+<a id="output-plugins" class="anchor" href="#output-plugins" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Output Plugins</h1>
+
+<p>dataShark provides the following 3 output plugins out-of-the-box for processed data persistence or transmission:</p>
+
+<ol>
+<li>Elasticsearch</li>
+<li>Syslog</li>
+<li>CSV</li>
+</ol>
+
+<p>Each of these plugins requires its own basic set of settings, described below.</p>
+
+<h3>
+<a id="1-elasticsearch-output-plugin" class="anchor" href="#1-elasticsearch-output-plugin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Elasticsearch Output Plugin</h3>
+
+<p>The Elasticsearch output plugin allows you to easily push JSON documents to your Elasticsearch Node. This allows users to build visualizations using Kibana over processed data.</p>
+
+<p>Following is the basic template for configuring Elasticsearch output plugin:</p>
+
+<pre><code>output = elasticsearch
+[out_elasticsearch]
+        host = 127.0.0.1
+        port = 9200
+        index_name = usecase
+        doc_type = spark-driver
+        pkey = source_ip
+        score = anomaly_score
+        title = Use Case
+        debug = false
+</code></pre>
+
+<p>All settings in the config are optional. Their default values are displayed in the config above.</p>
+
+<pre><code>`host` : Host IP or Hostname or the ES server.
+`port` : Port Number of ES Server.
+`index_name` : Name of the index to push documents to for this use case.
+`doc_type` : Document Type Name for this use case.
+`pkey` : Primary Key Field name to show in ES Document.
+`score` : Anomaly Score Key Field Name to show in ES Document.
+`title` : The value of the title field in the ES Document.
+`debug` : Set this to true to display each JSON record being push to ES on the console.
+</code></pre>
+
+<h3>
+<a id="2-syslog-output-plugin" class="anchor" href="#2-syslog-output-plugin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>2. Syslog Output Plugin</h3>
+
+<p>The Syslog Output plugin outputs JSON documents to the specified Syslog Server IP and Port. Following is the sample configuration with default settings for the plugin (all settings are optional):</p>
+
+<pre><code>output = syslog
+[out_syslog]
+        host = 127.0.0.1
+        port = 514
+        pkey = source_ip
+        score = anomaly_score
+        title = Use Case Title
+        debug = false
+</code></pre>
+
+<p>The settings are similar to that of elasticsearch.</p>
+
+<h3>
+<a id="3-csv-output-plugin" class="anchor" href="#3-csv-output-plugin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3. CSV Output Plugin</h3>
+
+<p>The CSV Output Plugins writes and appends output from Spark Use Case to a specified CSV File. Following is the sample configuration with default settings of the plugin (all settings are optional):</p>
+
+<pre><code>output = csv
+[out_csv]
+        path = UseCase.csv
+        separator = ,
+        quote_char = '"'
+        title = Use Case
+        debug = false
+</code></pre>
+
+<h1>
+<a id="input-plugins" class="anchor" href="#input-plugins" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Input Plugins</h1>
+
+<p>dataShark allows different inputs to be used per use case. These can be used to override the Global Kafka Stream per use case. Currently, only two plugins are provided:</p>
+
+<ol>
+<li>Kafka</li>
+<li>File</li>
+</ol>
+
+<p>Each of these plugins requires its own basic set of settings, described below.</p>
+
+<h3>
+<a id="1-kafka-input-plugin" class="anchor" href="#1-kafka-input-plugin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Kafka Input Plugin</h3>
+
+<p>This plugin can be used to specify a different Kafka Queue or a totally different Kafka Host to pickup the input stream from. The plugin has some mandatory configuration. A sample configuration is given below and can be modified as per need:</p>
+
+<pre><code>[in_kafka]
+        host = 127.0.0.1
+        port = 2181
+        topic = logs_queue
+        partitions = 1
+</code></pre>
+
+<p>All keys are mandatory and need to be defined.</p>
+
+<h3>
+<a id="2-file-input-plugin" class="anchor" href="#2-file-input-plugin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>2. File Input Plugin</h3>
+
+<p>This plugin can be used to pickup the input stream from a local folder (as suggested by Spark). The folder is monitored for any new files and loads the data from them. The plugin has some mandatory configuration. A sample configuration is given below and can be modified as per need:</p>
+
+<pre><code>[in_file]
+        folder_path = /tmp/mydata
+</code></pre>
+
+<p>All keys are mandatory and need to be defined.</p>
+
+<h1>
+<a id="uninstall-datashark" class="anchor" href="#uninstall-datashark" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Uninstall dataShark</h1>
+
+<p>dataShark gets installed locally to /etc/datashark (default). If you had specified the prefix during install, the location might be different. An environment variable DATASHARK_HOME is set indicating the directory where dataShark resides. To uninstall dataShark, just remove the datashark directory by issuing the following command:</p>
+
+<pre><code>rm -fr $DATASHARK_HOME
+</code></pre>
+
+<blockquote>
+<p><em>Note</em>: Please take a backup of the conf folder before executing the above command to backup any custom use cases you may have placed in dataShark.  </p>
+</blockquote>
+
+<p>Some environment variables were also set in the bashrc file. You may remove the lines from <code>/etc/bashrc (for CentOS)</code> or <code>/etc/bash.bashrc (for Ubuntu)</code>. A typical installation adds the following lines to the bashrc file:</p>
+
+<pre><code>## ENVIRONMENT VARIABLES SET BY DATASHARK
+export DATASHARK_HOME=/etc/datashark
+export JAVA_HOME=/etc/datashark/java
+export JRE_HOME=/etc/datashark/java/jre
+export PATH=$PATH:/etc/datashark/java/bin:/etc/datashark/java/jre/bin
+export PATH=$PATH:/etc/datashark/scala/bin
+export PATH=$PATH:/etc/datashark/spark/bin
+export SPARK_HOME=/etc/datashark/spark
+export PYTHONPATH=$SPARK_HOME/python:$PYTHONPATH
+## END OF VARIABLES BY DATASHARK
+</code></pre>
+
+<h1>
+<a id="changelog" class="anchor" href="#changelog" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Changelog</h1>
+
+<h3>
+<a id="v11" class="anchor" href="#v11" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>v1.1</h3>
+
+<ul>
+<li>Adding a debug feature for standalone mode to quickly display results on console.</li>
+<li>Adding Input plugins Kafka and File, which can be used to override the Global Kafka Stream per use case.</li>
+<li>Changed the naming convention used in Output Plugin conf.</li>
+<li>Fixing a bug where an empty output conf would cause dataShark to crash.</li>
+</ul>
+
+<h3>
+<a id="v10" class="anchor" href="#v10" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>v1.0</h3>
+
+<ul>
+<li>Initial Release of dataShark</li>
+</ul>
+
+<h1>
+<a id="contacts" class="anchor" href="#contacts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contacts</h1>
+
+<p>Discussion / Forum: <a href="https://groups.google.com/forum/#!forum/datashark">https://groups.google.com/forum/#!forum/datashark</a>
+For anything else: <a href="mailto:datashark@makemytrip.com">datashark@makemytrip.com</a></p>
+
+<h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h1>
+
+<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
+
+<p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
+
+<p><a href="https://www.gnu.org/licenses/gpl.txt"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt=""></a></p>
+
+<h1>
+<a id="authors" class="anchor" href="#authors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors</h1>
+
+<ul>
+<li><a href="https://twitter.com/KunalAggarwal92">Kunal Aggarwal</a></li>
+<li><a href="https://twitter.com/dkalaan">Dhruv Kalaan</a></li>
+<li><a href="https://twitter.com/vikramm811">Vikram Mehta</a></li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/makemytrip/dataShark">dataShark</a> is maintained by <a href="https://github.com/makemytrip">makemytrip</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
