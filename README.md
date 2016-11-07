@@ -38,6 +38,7 @@ Table of Contents
       * [1. Kafka Input Plugin](#1-kafka-input-plugin)
       * [2. File Input Plugin](#2-file-input-plugin)
   * [Uninstall dataShark](#uninstall-datashark)
+  * [Changelog](#changelog)
   * [Contacts](#contacts)
   * [License](#license)
   * [Authors](#authors)
@@ -575,6 +576,20 @@ export SPARK_HOME=/etc/datashark/spark
 export PYTHONPATH=$SPARK_HOME/python:$PYTHONPATH
 ## END OF VARIABLES BY DATASHARK
 ```
+
+Changelog
+=========
+
+### v1.1
+
+ * Adding a debug feature for standalone mode to quickly display results on console.
+ * Adding Input plugins Kafka and File, which can be used to override the Global Kafka Stream per use case.
+ * Changed the naming convention used in Output Plugin conf.
+ * Fixing a bug where an empty output conf would cause dataShark to crash.
+
+### v1.0
+
+ * Initial Release of dataShark
 
 Contacts
 ========
