@@ -531,6 +531,7 @@ Each of these plugins requires its own basic set of settings, described below.
 This plugin can be used to specify a different Kafka Queue or a totally different Kafka Host to pickup the input stream from. The plugin has some mandatory configuration. A sample configuration is given below and can be modified as per need:
 
 ```
+input = kafka
 [in_kafka]
         host = 127.0.0.1
         port = 2181
@@ -545,6 +546,7 @@ All keys are mandatory and need to be defined.
 This plugin can be used to pickup the input stream from a local folder (as suggested by Spark). The folder is monitored for any new files and loads the data from them. The plugin has some mandatory configuration. A sample configuration is given below and can be modified as per need:
 
 ```
+input = file
 [in_file]
         folder_path = /tmp/mydata
 ```
