@@ -16,6 +16,7 @@
 # along with dataShark.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+import json
 
 class Plugin:
 
@@ -38,6 +39,10 @@ class Plugin:
 	                "es.port" : self.port,
         	        "es.resource" : "%s/%s" % (self.index_name, self.doc_type)
 		}
+
+		if "options" in conf:
+			for key, val in conf['options'].iteritems():
+				self.es_conf[key] = val
 
 	def save(self, dataRDD, progType):
 		if progType == "streaming":
@@ -78,4 +83,7 @@ class Plugin:
 		except:
 			metadata = {}
 		data.update(metadata)
+		if "es.input.json" in self.es_conf:
+			if self.es_conf['es.input.json'] == "true":
+				return ('key', json.dumps(data))
 		return ('key', data)
