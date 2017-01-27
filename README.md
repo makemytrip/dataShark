@@ -233,7 +233,15 @@ kafka.partitions = 1
 
 hdfs.host = 127.0.0.1
 hdfs.port = 9000
+
+[spark_config]
+spark.logConf                           = true
+spark.kryo.referenceTracking            = false
+spark.serializer                        = org.apache.spark.serializer.KryoSerializer
+spark.scheduler.mode                    = FAIR
 ```
+
+[spark_conf] section is an optional section that can be used to pass spark conf for tuning the spark job. This applies both to standalone and production mode.
 
 Then we need to specify the Spark Master in datashark-env.sh:
 
@@ -316,7 +324,7 @@ Files and directories have been explained below:
 The heart of dataShark, this is where the magic happens. When using dataShark, you will *never* have to change the contents of this file.
 
 ### datashark.conf
-The main configuration file which specifies the Kafka Queue to be consumed for Streaming Use Cases.
+The main configuration file which specifies the Kafka Queue to be consumed for Streaming Use Cases and Spark specific configuration.
 
 ### start.sh
 The shell file that is used to start up spark with all its dependencies and use cases.
@@ -510,7 +518,7 @@ The CSV Output Plugins writes and appends output from Spark Use Case to a specif
 output = csv
 [out_csv]
         path = UseCase.csv
-        separator = ,
+        separator = ','
         quote_char = '"'
         title = Use Case
         debug = false

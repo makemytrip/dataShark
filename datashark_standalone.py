@@ -69,12 +69,17 @@ if __name__ == "__main__":
 
 	print "Loaded Confs: %s" % loaded.keys()
 
-	sc = SparkContext(appName="dataShark Standalone")
+	config = ConfigObj("%s/datashark.conf" % CODE_DIR)
+
+        spark_conf_dict = config.get("spark_config", {})
+        conf = SparkConf()
+        for key, val in spark_conf_dict.iteritems():
+                conf = conf.set(key, val)
+
+	sc = SparkContext(appName="dataShark Standalone", conf = conf)
 
 	accum = sc.accumulator(0)
 	
-	config = ConfigObj("%s/datashark.conf" % CODE_DIR)
-
 	try:
 		DEBUG_MODE = sys.argv[2]
 		if DEBUG_MODE == "debug":
