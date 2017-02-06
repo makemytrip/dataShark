@@ -20,6 +20,7 @@ import os
 import sys
 import imp
 import json
+import uuid
 import argparse
 
 from configobj import ConfigObj
@@ -68,6 +69,10 @@ if __name__ == "__main__":
 
 	print "Loaded Confs: %s" % loaded.keys()
 
+	token = str(uuid.uuid4()).upper()
+	app_name = "dataShark_%s" % token
+	print "App Name: %s" % app_name
+
 	config = ConfigObj("%s/datashark.conf" % CODE_DIR)
 	
 	spark_conf_dict = config.get("spark_config", {})
@@ -75,7 +80,7 @@ if __name__ == "__main__":
 	for key, val in spark_conf_dict.iteritems():
 		conf = conf.set(key, val)
 
-	sc = SparkContext(appName="dataShark", conf = conf)
+	sc = SparkContext(appName = app_name, conf = conf)
 
 	accum = sc.accumulator(0)
 
@@ -123,7 +128,7 @@ if __name__ == "__main__":
 		else:
 			ssc.checkpoint('hdfs://%s:%s/user/root/ckpt' % (HDFS_HOST, HDFS_PORT))
 		
-		streamingData = KafkaUtils.createStream(ssc, KAFKA_SRC, KAFKA_CONSUMER_NAME, {KAFKA_QUEUE_NAME: KAFKA_PARTITIONS}).cache()
+		streamingData = KafkaUtils.createStream(ssc, KAFKA_SRC, "%s_%s" % (KAFKA_CONSUMER_NAME, token), {KAFKA_QUEUE_NAME: KAFKA_PARTITIONS}).cache()
 		for cfile, conf in loaded.iteritems():
 			if conf['type'] == "streaming":
 				overrideStreamingData = None
@@ -131,7 +136,7 @@ if __name__ == "__main__":
                                         input_type = conf['input']
                                         input_conf = conf["in_%s" % input_type]
                                         if input_type == "kafka":
-                                                overrideStreamingData = KafkaUtils.createStream(ssc, "%s:%s" % (input_conf['host'], input_conf['port']), KAFKA_CONSUMER_NAME, {input_conf['topic']: int(input_conf['partitions'])}).cache()
+                                                overrideStreamingData = KafkaUtils.createStream(ssc, "%s:%s" % (input_conf['host'], input_conf['port']), "%s_%s" % (KAFKA_CONSUMER_NAME, token), {input_conf['topic']: int(input_conf['partitions'])}).cache()
                                         elif input_type == "file":
                                                 overrideStreamingData = ssc.textFileStream(input_conf['folder_path']).cache()
 				filename, extension = os.path.splitext(conf['code'])
