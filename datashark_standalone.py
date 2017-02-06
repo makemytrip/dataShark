@@ -134,7 +134,7 @@ if __name__ == "__main__":
 		ssc = StreamingContext(sc, 1)
 		ssc.checkpoint('/tmp/ckpt')
 		
-		streamingData = KafkaUtils.createStream(ssc, KAFKA_SRC, KAFKA_CONSUMER_NAME, {KAFKA_QUEUE_NAME: KAFKA_PARTITIONS})
+		streamingData = KafkaUtils.createStream(ssc, KAFKA_SRC, KAFKA_CONSUMER_NAME, {KAFKA_QUEUE_NAME: KAFKA_PARTITIONS}).cache()
 		for cfile, conf in loaded.iteritems():
 			if conf['type'] == "streaming":
 				overrideStreamingData = None
@@ -142,9 +142,9 @@ if __name__ == "__main__":
 					input_type = conf['input']
 					input_conf = conf["in_%s" % input_type]
 					if input_type == "kafka":
-						overrideStreamingData = KafkaUtils.createStream(ssc, "%s:%s" % (input_conf['host'], input_conf['port']), KAFKA_CONSUMER_NAME, {input_conf['topic']: int(input_conf['partitions'])})
+						overrideStreamingData = KafkaUtils.createStream(ssc, "%s:%s" % (input_conf['host'], input_conf['port']), KAFKA_CONSUMER_NAME, {input_conf['topic']: int(input_conf['partitions'])}).cache()
 					elif input_type == "file":
-						overrideStreamingData = ssc.textFileStream(input_conf['folder_path'])
+						overrideStreamingData = ssc.textFileStream(input_conf['folder_path']).cache()
 				filename, extension = os.path.splitext(conf['code'])
 				loader = __import__(filename)
 				filters = conf.get('log_filter', None)
