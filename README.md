@@ -179,7 +179,7 @@ Following is the sample output for a sample Standalone Mode run:
 
                           STANDALONE MODE
 
-                               v1.1
+                               v1.2
 
 
 Loaded Confs: ['conf/wordcount/wordcount.conf']
@@ -204,7 +204,7 @@ Following is the sample output for a sample Standalone Mode run in debugging mod
 
                           STANDALONE MODE
 
-                               v1.1
+                               v1.2
 
 
 [*] Debug Mode is ON
@@ -268,7 +268,7 @@ Following is the sample output of the first run:
 
                           PRODUCTION MODE
 
-                               v1.1
+                               v1.2
 
 
 [*] 2016-10-12 14:59:06 Running Spark on Cluster
@@ -305,7 +305,7 @@ dataShark/
 ├── datashark-env.sh
 ├── install.sh
 ├── lib
-│   ├── elasticsearch-hadoop-2.2.0.jar
+│   ├── elasticsearch-hadoop-5.2.0.jar
 │   └── spark-streaming-kafka-assembly-1.6.1.jar
 ├── plugins
 │   ├── __init__.py
@@ -589,6 +589,15 @@ export PYTHONPATH=$SPARK_HOME/python:$PYTHONPATH
 
 Changelog
 =========
+
+### v1.2
+
+ * Fixing a bug where filters in multiple conf were not loaded properly.
+ * Adding `spark_conf` in datashark.conf to add spark configuration.
+ * Making input streams cached for better performance.
+ * Making Spark application name dynamic.
+ * Making spark run use cases concurrently, previously default was used (1 concurrent job)
+ * Updating Elasticsearch jar to support the latest Elasticsearch Release 5.2.0
 
 ### v1.1
 

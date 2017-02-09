@@ -59,7 +59,7 @@ echo '        \__,_/\__,_/\__/\__,_//____/_/ /_/\__,_/_/  /_/|_|  '
 echo '                                                            '
 echo '                          STANDALONE MODE                   '
 echo '                                                            '
-echo '                               v1.1                         '
+echo '                               v1.2                         '
 echo '                                                            '
 echo '                                                            '
       
