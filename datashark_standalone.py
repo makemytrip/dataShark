@@ -34,15 +34,17 @@ from pyspark.mllib.clustering import KMeans
 from pyspark.streaming.kafka import KafkaUtils
 
 def logFilter(line, conf):
-        if 'include' in conf:
-                for key, value in conf['include'].iteritems():
-                        if not re.match(value, json.loads(line[1])[key]):
-                                return False
-        if 'exclude' in conf:
-                for key, value in conf['exclude'].iteritems():
-                        if re.match(value, json.loads(line[1])[key]):
-                                return False
-        return True
+	def rowFilter(line):
+		if 'include' in conf:
+			for key, value in conf['include'].iteritems():
+				if not re.match(value, json.loads(line[1])[key]):
+					return False
+		if 'exclude' in conf:
+			for key, value in conf['exclude'].iteritems():
+				if re.match(value, json.loads(line[1])[key]):
+					return False
+		return True
+	return rowFilter
 
 if __name__ == "__main__":
 
@@ -153,7 +155,7 @@ if __name__ == "__main__":
 				else:
 					localStream = streamingData
 				if filters:
-					localStream = localStream.filter(lambda line: logFilter(line, filters))
+					localStream = localStream.filter(logFilter(filters))
 				print " - Starting %s" % conf['name']
 				output_module = conf['output']
 				print "   + Output Module: %s" % str(output_module).title()

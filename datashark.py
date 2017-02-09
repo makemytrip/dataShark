@@ -34,16 +34,18 @@ from pyspark.streaming import StreamingContext
 from pyspark.mllib.clustering import KMeans
 from pyspark.streaming.kafka import KafkaUtils
 
-def logFilter(line, conf):
-        if 'include' in conf:
-                for key, value in conf['include'].iteritems():
-                        if not re.match(value, json.loads(line[1])[key]):
-                                return False
-        if 'exclude' in conf:
-                for key, value in conf['exclude'].iteritems():
-                        if re.match(value, json.loads(line[1])[key]):
-                                return False
-        return True
+def logFilter(conf):
+	def rowFilter(line):
+		if 'include' in conf:
+			for key, value in conf['include'].iteritems():
+				if not re.match(value, json.loads(line[1])[key]):
+					return False
+		if 'exclude' in conf:
+			for key, value in conf['exclude'].iteritems():
+				if re.match(value, json.loads(line[1])[key]):
+					return False
+		return True
+	return rowFilter
 
 if __name__ == "__main__":
 
@@ -68,6 +70,7 @@ if __name__ == "__main__":
 		print "Could not load : %s" % i
 
 	print "Loaded Confs: %s" % loaded.keys()
+	loaded_confs_len = len(loaded)
 
 	token = str(uuid.uuid4()).upper()
 	app_name = "dataShark_%s" % token
@@ -79,6 +82,7 @@ if __name__ == "__main__":
 	conf = SparkConf()
 	for key, val in spark_conf_dict.iteritems():
 		conf = conf.set(key, val)
+	conf = conf.set("spark.streaming.concurrentJobs", str(loaded_confs_len))
 
 	sc = SparkContext(appName = app_name, conf = conf)
 
@@ -129,14 +133,16 @@ if __name__ == "__main__":
 			ssc.checkpoint('hdfs://%s:%s/user/root/ckpt' % (HDFS_HOST, HDFS_PORT))
 		
 		streamingData = KafkaUtils.createStream(ssc, KAFKA_SRC, "%s_%s" % (KAFKA_CONSUMER_NAME, token), {KAFKA_QUEUE_NAME: KAFKA_PARTITIONS}).cache()
+		app_counter = 0
 		for cfile, conf in loaded.iteritems():
+			app_counter += 1
 			if conf['type'] == "streaming":
 				overrideStreamingData = None
                                 if "input" in conf:
                                         input_type = conf['input']
                                         input_conf = conf["in_%s" % input_type]
                                         if input_type == "kafka":
-                                                overrideStreamingData = KafkaUtils.createStream(ssc, "%s:%s" % (input_conf['host'], input_conf['port']), "%s_%s" % (KAFKA_CONSUMER_NAME, token), {input_conf['topic']: int(input_conf['partitions'])}).cache()
+                                                overrideStreamingData = KafkaUtils.createStream(ssc, "%s:%s" % (input_conf['host'], input_conf['port']), "%s_%s_%s" % (KAFKA_CONSUMER_NAME, token, app_counter), {input_conf['topic']: int(input_conf['partitions'])}).cache()
                                         elif input_type == "file":
                                                 overrideStreamingData = ssc.textFileStream(input_conf['folder_path']).cache()
 				filename, extension = os.path.splitext(conf['code'])
@@ -144,7 +150,7 @@ if __name__ == "__main__":
 				filters = conf.get('log_filter', None)
 				localStream = streamingData
 				if filters:
-					localStream = localStream.filter(lambda line: logFilter(line, filters))
+					localStream = localStream.filter(logFilter(filters))
 				print " - Starting %s" % conf['name']
 				output_module = conf['output']
 				print "   + Output Module: %s" % str(output_module).title()
