@@ -29,7 +29,7 @@ from glob import glob
 CONF_DIR = "conf"
 CODE_DIR = os.path.dirname(os.path.realpath(__file__))
 
-from pyspark import SparkContext
+from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.mllib.clustering import KMeans
 from pyspark.streaming.kafka import KafkaUtils
