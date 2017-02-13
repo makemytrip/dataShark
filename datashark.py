@@ -117,7 +117,7 @@ if __name__ == "__main__":
 				filename, extension = os.path.splitext(conf['code'])
 				loader = __import__(filename)
 				batchData = sc.textFile("hdfs://%s:%s/user/root/driverFiles/%s" % (HDFS_HOST, HDFS_PORT, conf['file']))
-				dataRDD = loader.load(batchData)
+				dataRDD = loader.load(batchData, conf = conf)
 				output_module = conf['output']
 				output = locals()['out_%s' % output_module]
 				out_module = output.Plugin(conf.get("out_%s" % conf['output'], {}))
@@ -159,7 +159,7 @@ if __name__ == "__main__":
 				else:
 					training_log_file = "%s/%s" % (CODE_DIR, conf['training'])
 				trainingData = sc.textFile("hdfs://%s:%s/user/root/driverFiles/%s" % (HDFS_HOST, HDFS_PORT, conf['training']))
-				dataRDD = loader.load(localStream, trainingData, context = sc)
+				dataRDD = loader.load(localStream, trainingData, context = sc, conf = conf)
 				
 				output = locals()['out_%s' % output_module]
 				out_module = output.Plugin(conf.get("out_%s" % conf['output'], {}))

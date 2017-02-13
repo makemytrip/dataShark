@@ -15,6 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with dataShark.  If not, see <http://www.gnu.org/licenses/>.
 
-def load(batchData):
+def load(batchData, conf):
 	words = batchData.flatMap(lambda x: x.split()).map(lambda x: (x.lower(), 1))
 	return words.reduceByKey(lambda a, b: a + b)

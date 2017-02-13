@@ -123,7 +123,7 @@ if __name__ == "__main__":
 				del cfile[-1]
 				cfile = "/".join(cfile)
 				batchData = sc.textFile("%s/%s/%s" % (CODE_DIR, cfile, conf['file']))
-				dataRDD = loader.load(batchData)
+				dataRDD = loader.load(batchData, conf = conf)
 				if DEBUG_MODE:
 					print dataRDD.collect()
 				else:
@@ -163,7 +163,7 @@ if __name__ == "__main__":
                                 del cfile[-1]
                                 cfile = "/".join(cfile)
 				trainingData = sc.textFile("%s/%s/%s" % (CODE_DIR, cfile, conf['training']))
-				dataRDD = loader.load(localStream, trainingData, context = sc)
+				dataRDD = loader.load(localStream, trainingData, context = sc, conf = conf)
 				if DEBUG_MODE:
 					dataRDD.pprint()
 				else:		
