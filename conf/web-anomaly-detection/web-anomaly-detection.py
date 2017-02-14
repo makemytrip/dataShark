@@ -30,7 +30,7 @@ def make_features(a, b):
 	
 
 # Function to process raw training and streaming data
-def processjson(data, pattern):
+def process_logs(data, pattern):
 	line = re.match(pattern, data)
 	logline = line.groupdict()
 
@@ -66,7 +66,7 @@ def predict_cluster(row, model):
 def load(streamingData, trainingData, context, conf):
 
 	# Process JSON Training Logs
-	rawTrainingData = trainingData.map(lambda s: processjson(s, conf['apache_access_logs_pattern']))
+	rawTrainingData = trainingData.map(lambda s: process_logs(s, conf['apache_access_logs_pattern']))
 	
 	# Reduce Training Logs to get counts of 2xx and 5xx response codes against an IP
 	rawTrainingData = rawTrainingData.reduceByKey(make_features)
@@ -85,7 +85,7 @@ def load(streamingData, trainingData, context, conf):
 		print model.centers[i]
 	
 	# Process incoming JSON Logs from Kafka Stream
-        rawTestingData = streamingData.map(lambda s: processjson(s, conf['apache_access_logs_pattern']))
+        rawTestingData = streamingData.map(lambda s: process_logs(s, conf['apache_access_logs_pattern']))
 
 	# Reduce 60 seconds of incoming data in a 60 seconds sliding window and calculate distance from cluster center it belongs to
         testing_data = rawTestingData.reduceByKeyAndWindow(make_features, lambda a, b: [a[0] - b[0], a[1] - b[1]], 60, 60).map(lambda s: predict_cluster(s, model))
