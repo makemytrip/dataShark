@@ -52,7 +52,7 @@ echo '        \__,_/\__,_/\__/\__,_//____/_/ /_/\__,_/_/  /_/|_|  '
 echo '                                                            '
 echo '                          PRODUCTION MODE                   '
 echo '                                                            '
-echo '                               v1.2                         '
+echo '                              v1.2.1                        '
 echo '                                                            '
 echo '                                                            '
 

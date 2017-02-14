@@ -22,6 +22,7 @@ Table of Contents
       * [install.sh](#installsh)
       * [standalone.sh](#standalonesh)
       * [conf/](#conf)
+      * [conf/web-anomaly-detection/web-anomaly-detection[.py|.conf]](#confweb-anomaly-detectionweb-anomaly-detectionpyconf)
       * [conf/wordcount/wordcount[.py|.conf|.txt]](#confwordcountwordcountpyconftxt)
       * [lib/](#lib)
       * [plugins/output/](#pluginsoutput)
@@ -179,7 +180,7 @@ Following is the sample output for a sample Standalone Mode run:
 
                           STANDALONE MODE
 
-                               v1.2
+                              v1.2.1
 
 
 Loaded Confs: ['conf/wordcount/wordcount.conf']
@@ -204,7 +205,7 @@ Following is the sample output for a sample Standalone Mode run in debugging mod
 
                           STANDALONE MODE
 
-                               v1.2
+                              v1.2.1
 
 
 [*] Debug Mode is ON
@@ -268,7 +269,7 @@ Following is the sample output of the first run:
 
                           PRODUCTION MODE
 
-                               v1.2
+                              v1.2.1
 
 
 [*] 2016-10-12 14:59:06 Running Spark on Cluster
@@ -294,6 +295,10 @@ Following is the basic directory structure of dataShark after deployment.
 dataShark/
 ├── conf
 │   ├── __init__.py
+│   ├── web-anomaly-detection
+│   │   ├── test_access_log
+│   │   ├── web-anomaly-detection.conf
+│   │   └── web-anomaly-detection.py
 │   └── wordcount
 │       ├── __init__.py
 │       ├── wordcount.conf
@@ -343,6 +348,9 @@ This script is the helper for datashark_standalone.py. This loads all environmen
 
 ### conf/
 This directory is where all use cases are placed. Refer to [Writing your own use cases using dataShark](#writing-your-own-use-cases-using-datashark) on how to write your own plugin use cases.
+
+### conf/web-anomaly-detection/web-anomaly-detection[.py|.conf]
+This is the sample streaming use case that can be used to identify anomalies in live web traffic. It uses a sample log file `test_access_log` to train the K-Means model. By default, the input stream for the use case is File and monitors the directory /opt/logs for any incoming log files. You can either provide your own log file and correspondingly change the Regex Format to match your own log format in the conf file or just use the provided sample access log file to quickly get started.
 
 ### conf/wordcount/wordcount[.py|.conf|.txt]
 Wordcount is a sample use case provided with dataShark for trying out batch processing. The wordcount.txt file is a standard GNUv3 License file.
@@ -589,6 +597,12 @@ export PYTHONPATH=$SPARK_HOME/python:$PYTHONPATH
 
 Changelog
 =========
+
+### v1.2.1
+
+ * Adding a Streaming Use Case (Web Anomaly Detection) to detect web anomalies in live web traffic.
+ * Passing the Use case Conf to its code allowing a user to use their own defined parameters inside the code.
+ * Display the Input Module being used on code startup.
 
 ### v1.2
 
