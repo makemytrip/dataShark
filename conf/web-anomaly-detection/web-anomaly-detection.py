@@ -88,6 +88,6 @@ def load(streamingData, trainingData, context, conf):
         rawTestingData = streamingData.map(lambda s: processjson(s, conf['apache_access_logs_pattern']))
 
 	# Reduce 60 seconds of incoming data in a 60 seconds sliding window and calculate distance from cluster center it belongs to
-        testing_data = rawTestingData.reduceByKeyAndWindow(make_features, lambda a, b: [a[0] - b[0], a[1] - b[1]], 10, 10).map(lambda s: predict_cluster(s, model))
+        testing_data = rawTestingData.reduceByKeyAndWindow(make_features, lambda a, b: [a[0] - b[0], a[1] - b[1]], 60, 60).map(lambda s: predict_cluster(s, model))
 
 	return testing_data
