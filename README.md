@@ -450,12 +450,13 @@ The data file provided as input in the .conf file is loaded and passed to the fu
 *For stream processing:*
 
 ```
-def load(streamingData, trainingData, context)
+def load(streamingData, trainingData, context, conf)
 ```
 
 `streamingData` is the Kafka Stream being sent to the function load. This is of type *DStream*.
 `trainingData` is the Training File loaded from the *training* key mention in the .conf file. It is of the type *PythonRDD*.
 `context` is the spark context loaded in the driver. It may be used for using the accumulator, etc.
+`conf` is the Use Case conf which can be used internally in the code to allow user to pass custom configuration.
 
 The function `load` expects a processed *DStream* to be returned from it. Each RDD in the DStream should be in the following format (this format is necessary for usability in output plugins):
 `('primary_key', anomaly_score, {"some_metadata": "dictionary here"})`
