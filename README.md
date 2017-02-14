@@ -296,6 +296,9 @@ dataShark/
 ├── conf
 │   ├── __init__.py
 │   ├── web-anomaly-detection
+│   │   ├── kibana_dashboard.json
+│   │   ├── kibana_visualizations.json
+│   │   ├── README.md
 │   │   ├── test_access_log
 │   │   ├── web-anomaly-detection.conf
 │   │   └── web-anomaly-detection.py
@@ -603,6 +606,7 @@ Changelog
  * Adding a Streaming Use Case (Web Anomaly Detection) to detect web anomalies in live web traffic.
  * Passing the Use case Conf to its code allowing a user to use their own defined parameters inside the code.
  * Display the Input Module being used on code startup.
+ * Adding Kibana Dashboards for visualizing Streaming use case.
 
 ### v1.2
 
