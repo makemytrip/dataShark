@@ -138,12 +138,15 @@ if __name__ == "__main__":
 			app_counter += 1
 			if conf['type'] == "streaming":
 				overrideStreamingData = None
+				input_module = "Global Kafka Stream"
                                 if "input" in conf:
                                         input_type = conf['input']
                                         input_conf = conf["in_%s" % input_type]
                                         if input_type == "kafka":
+						input_module = "Local Kafka Stream"
                                                 overrideStreamingData = KafkaUtils.createStream(ssc, "%s:%s" % (input_conf['host'], input_conf['port']), "%s_%s_%s" % (KAFKA_CONSUMER_NAME, token, app_counter), {input_conf['topic']: int(input_conf['partitions'])}).cache()
                                         elif input_type == "file":
+						input_module = "File"
                                                 overrideStreamingData = ssc.textFileStream(input_conf['folder_path']).cache()
 				filename, extension = os.path.splitext(conf['code'])
 				loader = __import__(filename)
@@ -153,6 +156,7 @@ if __name__ == "__main__":
 					localStream = localStream.filter(logFilter(filters))
 				print " - Starting %s" % conf['name']
 				output_module = conf['output']
+				print "   + Input Module: %s" % input_module
 				print "   + Output Module: %s" % str(output_module).title()
 				if os.path.exists("%s/%s" % (CONF_DIR, conf['training'])):
 					training_log_file = "%s/%s/%s" % (CODE_DIR, CONF_DIR, conf['training'])

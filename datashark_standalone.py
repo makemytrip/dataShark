@@ -141,11 +141,14 @@ if __name__ == "__main__":
 			if conf['type'] == "streaming":
 				overrideStreamingData = None
 				if "input" in conf:
+					input_module = "Global Kafka Stream"
 					input_type = conf['input']
 					input_conf = conf["in_%s" % input_type]
 					if input_type == "kafka":
+						input_module = "Local Kafka Stream"
 						overrideStreamingData = KafkaUtils.createStream(ssc, "%s:%s" % (input_conf['host'], input_conf['port']), KAFKA_CONSUMER_NAME, {input_conf['topic']: int(input_conf['partitions'])}).cache()
 					elif input_type == "file":
+						input_module = "File"
 						overrideStreamingData = ssc.textFileStream(input_conf['folder_path']).cache()
 				filename, extension = os.path.splitext(conf['code'])
 				loader = __import__(filename)
@@ -158,6 +161,7 @@ if __name__ == "__main__":
 					localStream = localStream.filter(logFilter(filters))
 				print " - Starting %s" % conf['name']
 				output_module = conf['output']
+				print "   + Input Module: %s" % input_module
 				print "   + Output Module: %s" % str(output_module).title()
 				cfile = cfile.split("/")
                                 del cfile[-1]
